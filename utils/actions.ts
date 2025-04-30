@@ -21,14 +21,20 @@ export type TourType = {
 
 type ChatMessage = ChatCompletionMessageParam;
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// update to gemini api key;
+const openai = new OpenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+});
 
 export const generateChatResponse = async (
   chatMessages: ChatMessage[]
 ): Promise<{ message: ChatMessage; tokens: number }> => {
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      // model: "gpt-4o-mini",
+      model: "gemini-2.0-flash-lite",
       messages: [
         { role: "system", content: "You are a helpful assistant." },
         ...chatMessages,
@@ -60,7 +66,7 @@ export const generateTourResponse = async ({
 }: {
   city: string;
   country: string;
-}): Promise<{tour:Tour,tokens:number} | null> => {
+}): Promise<{ tour: Tour; tokens: number } | null> => {
   const query = `Find a exact ${city} in this exact ${country}.
 If ${city} and ${country} exists, create a list of things families can do in this ${city},${country}. 
 Once you have a list, create a one-day tour. Response should be in the following JSON format: 
