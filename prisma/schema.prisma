@@ -8,15 +8,17 @@ datasource db {
 }
 
 model Tour {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  city        String
-  country     String
-  title       String
-  description String
-  image       String?
-  stops       Json
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  city           String
+  country        String
+  title          String
+  description    String
+  image          String?
+  stops          Json
+  weatherInfo    String[]
+  estimatedPrice String?
 
   @@unique([city, country])
 }

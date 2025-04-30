@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { FaBarsStaggered } from "react-icons/fa6";
 import MemberProfile from "./MemberProfile";
 import NavLinks from "./NavLinks";
 import SidebarHeader from "./SidebarHeader";

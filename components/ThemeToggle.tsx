@@ -11,7 +11,10 @@ const themes: Record<Theme, Theme> = {
 };
 
 const getThemeFromLocalStorage = (): Theme => {
-  return (localStorage?.getItem("theme") as Theme | null) ?? themes.light;
+  if (typeof window !== "undefined") {
+    return (localStorage.getItem("theme") as Theme | null) ?? themes.light;
+  }
+  return themes.light;
 };
 
 const ThemeToggle = () => {

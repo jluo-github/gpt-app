@@ -7,10 +7,10 @@ import {
   generateTourResponse,
   getExistingTour,
   subtractTokens,
+  TourType,
 } from "@/utils/actions";
 import { useAuth } from "@clerk/nextjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { ChatCompletionMessage } from "openai/resources/index.mjs";
 import type { FormEvent } from "react";
 import toast from "react-hot-toast";
 
@@ -20,7 +20,7 @@ type DestinationType = {
 };
 
 type TourInfoProps = {
-  tour: ChatCompletionMessage;
+  tour: TourType;
 };
 
 const NewTour = () => {

@@ -17,6 +17,8 @@ export type TourType = {
   description: string;
   image?: string | null;
   stops: string[];
+  estimatedPrice: string | null;
+  weatherInfo: string[];
 };
 
 type ChatMessage = ChatCompletionMessageParam;
@@ -67,19 +69,37 @@ export const generateTourResponse = async ({
   city: string;
   country: string;
 }): Promise<{ tour: Tour; tokens: number } | null> => {
-  const query = `Find a exact ${city} in this exact ${country}.
-If ${city} and ${country} exists, create a list of things families can do in this ${city},${country}. 
-Once you have a list, create a one-day tour. Response should be in the following JSON format: 
+  // prompt for generating a travel plan;
+  const query = `Generate a one-day travel plan for the city of ${city} in ${country}. Return the response strictly as clean, plain JSON (no markdown or text outside JSON). Include the following structured fields:
+
 {
   "tour": {
     "city": "${city}",
     "country": "${country}",
-    "title": "title of the tour",
-    "description": "description of the city and tour",
-    "stops": ["short paragraph on the stop 1 ", "short paragraph on the stop 2","short paragraph on the stop 3"]
+    "title": "A descriptive and engaging title for the trip",
+    "estimatedPrice": "An estimated total cost for the one-day tour in USD. Use $80–$250 depending on how touristy or expensive the city is.",
+    "description": "A short, exciting overview of the destination and tour",
+    "weatherInfo": [
+      "☀️ Spring: 59–77°F (15–25°C)",
+      "🌦️ Summer: 68–86°F (20–30°C)",
+      "🍂 Fall: 50–68°F (10–20°C)",
+      "❄️ Winter: 32–50°F (0–10°C)"
+    ],
+    "stops": [
+      "A short paragraph describing the first stop, with details of what to see or do.",
+      "A short paragraph for the second stop, focusing on local experience.",
+      "A short paragraph for the final stop, including food, views, or shopping."
+    ]
   }
 }
-If you can't find info on exact ${city}, or ${city} does not exist, or it's population is less than 1, or it is not located in the following ${country} return { "tour": null }, with no additional characters.`;
+
+Important:
+- Only respond with the final JSON.
+- Do not include markdown, explanation, or extra text.
+- Keep temperature ranges and prices realistic.
+- Ensure the JSON is valid and well-structured.
+- Return ONLY a raw JSON object. DO NOT wrap the result in any markdown.
+`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -92,12 +112,21 @@ If you can't find info on exact ${city}, or ${city} does not exist, or it's popu
       max_completion_tokens: 500,
     });
 
-    const messageContent = response.choices[0].message.content;
+    let messageContent = response.choices[0].message.content;
     if (!messageContent) {
       return null;
     }
 
     // console.log(" messageContent----", messageContent);
+
+    //  ```json blocks if present
+    if (messageContent.startsWith("```json") || messageContent.startsWith("```")) {
+      messageContent = messageContent
+        .replace(/```(json)?/, "")
+        .replace(/```$/, "")
+        .trim();
+    }
+
     const tourData = JSON.parse(messageContent);
 
     // return tourData.tour;
