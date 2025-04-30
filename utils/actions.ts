@@ -83,7 +83,7 @@ If you can't find info on exact ${city}, or ${city} does not exist, or it's popu
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gemini-2.0-flash-lite",
       messages: [
         { role: "system", content: "you are a tour guide" },
         { role: "user", content: query },
